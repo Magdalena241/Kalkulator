@@ -71,69 +71,41 @@ namespace Kalkulator
         }
 
         private void separatorButton_Click(object sender, EventArgs e)
-        {
-
+        {            
             Button button = (Button)sender;
-            string temp = button.Text;
-            if(mathSign !="")
-            {
-                if(secondNumber == "")
-                {
-                    secondNumber = "0" + temp;
-                }
-                else
-                {
-                   if(secondNumber.Contains(temp)==false)
-                    {
-                        secondNumber += temp;
-                    }
-                }
-            }
-            else
-            {
-                if (firstNumber == "")
-                {
-                    firstNumber = "0" + temp;
-                }
-                else
-                {
-                    if (firstNumber.Contains(temp) == false)
-                    {
-                        firstNumber += temp;
-                    }
-                }
-            }
-            updateScreen();
+            separator(button.Text);            
             label1.Focus();
         }
 
         private void Form1_KeyPress(object sender, KeyPressEventArgs e)
         {
-            int enter = (char)Keys.Enter;
             int back = (char)Keys.Back;
             if(e.KeyChar >= 48 && e.KeyChar<= 57)
             {
                 writeNumber(e.KeyChar.ToString());
+                e.Handled = true;
             }
             else if (e.KeyChar =='/' || e.KeyChar == '+' || e.KeyChar == '-' || e.KeyChar == 42)
             {
                 setSign(e.KeyChar.ToString());
+                e.Handled = true;
             }
             else if (e.KeyChar == 13 )
             {
                 calculate();
+                e.Handled = true;
             } 
-            else if (e.KeyChar == 46)
-            {
-                clearScreen();
-            }
             else if (e.KeyChar == back)
             {
                 backspace();
+                e.Handled = true;
             }
-            e.Handled = true;
+            else if (e.KeyChar == separatorButton.Text[0])
+            {
+                separator(e.KeyChar.ToString());
+                e.Handled = true;
+            }
         }
-
 
         private void writeNumber(string temp)
         {
@@ -239,6 +211,49 @@ namespace Kalkulator
             if (answer == "")
                 answer = "=" + c.ToString();
             updateScreen();
+        }
+
+        private void separator(string temp)
+        {
+            if (mathSign != "")
+            {
+                if (secondNumber == "")
+                {
+                    secondNumber = "0" + temp;
+                }
+                else
+                {
+                    if (secondNumber.Contains(temp) == false)
+                    {
+                        secondNumber += temp;
+                    }
+                }
+            }
+            else
+            {
+                if (firstNumber == "")
+                {
+                    firstNumber = "0" + temp;
+                }
+                else
+                {
+                    if (firstNumber.Contains(temp) == false)
+                    {
+                        firstNumber += temp;
+                    }
+                }
+            }
+            updateScreen();
+        }
+
+        private void Form1_KeyUp(object sender, KeyEventArgs e)
+        {
+           
+            if (e.KeyCode == Keys.Delete)
+            {
+                clearScreen();
+                e.Handled = true;
+            }
         }
     }
 }
