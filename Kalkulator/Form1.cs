@@ -23,35 +23,15 @@ namespace Kalkulator
             InitializeComponent();
             string separator = CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator;
             separatorButton.Text = separator;
+            label1.Focus();
+            
         }
 
         private void number_Click(object sender, EventArgs e)
         {
-            if(answer != "")
-            {
-                clearButton_Click(null, null);
-            }
             Button button = (Button)sender;
             string temp = button.Text;
-            if(mathSign != "")
-            {
-                if (temp == "0" && secondNumber == "0")
-                    return;
-                if (secondNumber == "0")
-                    secondNumber = "";
-                if(secondNumber.Length <20)
-                    secondNumber += temp;
-            }
-            else
-            {
-                if (temp == "0" && firstNumber == "0")
-                    return;
-                if (firstNumber == "0")
-                    firstNumber = "";
-                if (firstNumber.Length <20)
-                    firstNumber += temp;
-            }
-            updateScreen();
+            writeNumber(temp);
            
         }
 
@@ -67,81 +47,27 @@ namespace Kalkulator
 
         private void mathOperation_Click(object sender, EventArgs e)
         {
-            if (firstNumber == "")
-                firstNumber = "0";
-            if (answer != "")
-                return;
-            if (firstNumber[firstNumber.Length - 1] == separatorButton.Text[0])
-                firstNumber = firstNumber.Substring(0, firstNumber.Length - 1);
             Button button = (Button)sender;
-            mathSign = button.Text;
-            updateScreen();
+            setSign(button.Text);
+            label1.Focus();
         }
 
         private void clearButton_Click(object sender, EventArgs e)
         {
-            firstNumber = "";
-            secondNumber = "";
-            mathSign = "";
-            answer = "";
-            updateScreen();
+            clearScreen();
+            label1.Focus();
         }
 
         private void backButton_Click(object sender, EventArgs e)
         {
-            if (answer != "")
-                return;
-            if (mathSign != "")
-            {
-                if (secondNumber != "")
-                {
-                    int n = secondNumber.Length;
-                    secondNumber = secondNumber.Substring(0, n - 1);
-                }
-            }
-            else
-            {
-                if (firstNumber != "")
-                {
-                    int n = firstNumber.Length;
-                    firstNumber = firstNumber.Substring(0, n - 1);
-                }
-            }
-            updateScreen();
+            backspace();
+            label1.Focus();
         }
 
         private void equalButton_Click(object sender, EventArgs e)
         {
-            if (secondNumber == "")
-                secondNumber = "0";
-            if (secondNumber[secondNumber.Length - 1] == separatorButton.Text[0])
-                secondNumber = secondNumber.Substring(0, secondNumber.Length - 1);
-            double a = Double.Parse(firstNumber);
-            double b = Double.Parse(secondNumber);
-            double c=0;
-            if (mathSign == "+")
-            {
-                c = a + b;
-            }
-            else if (mathSign == "-")
-            {
-                c = a - b;
-            }
-            else if (mathSign == "*")
-            {
-                c = a * b;
-            }
-            else if (mathSign == "/")
-            {
-                if (b != 0)
-                    c = a / b;
-                else
-                    answer = "nie dzielimy przez 0";
-            }
-            if (answer == "")
-                answer = "="+ c.ToString();
-            updateScreen();
-
+            calculate();
+            label1.Focus();
         }
 
         private void separatorButton_Click(object sender, EventArgs e)
@@ -177,6 +103,141 @@ namespace Kalkulator
                     }
                 }
             }
+            updateScreen();
+            label1.Focus();
+        }
+
+        private void Form1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            int enter = (char)Keys.Enter;
+            int back = (char)Keys.Back;
+            if(e.KeyChar >= 48 && e.KeyChar<= 57)
+            {
+                writeNumber(e.KeyChar.ToString());
+            }
+            else if (e.KeyChar =='/' || e.KeyChar == '+' || e.KeyChar == '-' || e.KeyChar == 42)
+            {
+                setSign(e.KeyChar.ToString());
+            }
+            else if (e.KeyChar == 13 )
+            {
+                calculate();
+            } 
+            else if (e.KeyChar == 46)
+            {
+                clearScreen();
+            }
+            else if (e.KeyChar == back)
+            {
+                backspace();
+            }
+            e.Handled = true;
+        }
+
+
+        private void writeNumber(string temp)
+        {
+            if (answer != "")
+            {
+                clearButton_Click(null, null);
+            }
+            if (mathSign != "")
+            {
+                if (temp == "0" && secondNumber == "0")
+                    return;
+                if (secondNumber == "0")
+                    secondNumber = "";
+                if (secondNumber.Length < 20)
+                    secondNumber += temp;
+            }
+            else
+            {
+                if (temp == "0" && firstNumber == "0")
+                    return;
+                if (firstNumber == "0")
+                    firstNumber = "";
+                if (firstNumber.Length < 20)
+                    firstNumber += temp;
+            }
+            updateScreen();
+        }
+
+        private void clearScreen()
+        {
+            firstNumber = "";
+            secondNumber = "";
+            mathSign = "";
+            answer = "";
+            updateScreen();
+        }
+
+        private void setSign(string temp)
+        {
+            if (firstNumber == "")
+                firstNumber = "0";
+            if (answer != "")
+                return;
+            if (firstNumber[firstNumber.Length - 1] == separatorButton.Text[0])
+                firstNumber = firstNumber.Substring(0, firstNumber.Length - 1);
+            mathSign = temp;
+            updateScreen();
+        }
+
+        private void backspace()
+        {
+            if (answer != "")
+                return;
+            if (mathSign != "")
+            {
+                if (secondNumber != "")
+                {
+                    int n = secondNumber.Length;
+                    secondNumber = secondNumber.Substring(0, n - 1);
+                }
+            }
+            else
+            {
+                if (firstNumber != "")
+                {
+                    int n = firstNumber.Length;
+                    firstNumber = firstNumber.Substring(0, n - 1);
+                }
+            }
+            updateScreen();
+        }
+
+        private void calculate()
+        {
+            if (mathSign == "")
+                return;
+            if (secondNumber == "")
+                secondNumber = "0";
+            if (secondNumber[secondNumber.Length - 1] == separatorButton.Text[0])
+                secondNumber = secondNumber.Substring(0, secondNumber.Length - 1);
+            double a = Double.Parse(firstNumber);
+            double b = Double.Parse(secondNumber);
+            double c = 0;
+            if (mathSign == "+")
+            {
+                c = a + b;
+            }
+            else if (mathSign == "-")
+            {
+                c = a - b;
+            }
+            else if (mathSign == "*")
+            {
+                c = a * b;
+            }
+            else if (mathSign == "/")
+            {
+                if (b != 0)
+                    c = a / b;
+                else
+                    answer = "nie dzielimy przez 0";
+            }
+            if (answer == "")
+                answer = "=" + c.ToString();
             updateScreen();
         }
     }
